@@ -1,0 +1,135 @@
+
+#export PS1="\[\e[1;32;40m\]\h:\w\$"
+
+alias set-toolchain="ndstoolchain"
+alias set-linux-toolchain="linuxtoolchain"
+alias set-linux-home="linuxhome"
+alias set-andesigh-home="andesighroot"
+alias set-sd-home="sdhome"
+alias set-display="display_nds_env"
+alias c="clear"
+alias cd1="cd ../"
+alias cd2="cd ../../"
+alias cd3="cd ../../../"
+alias cd4="cd ../../../../"
+alias cd5="cd ../../../../../"
+function boot(){
+$ /{$LINUX_ROOT}/Prepare_rootfs.sh \
+--toolchain_path={$NDS_TOOLCHAIN} \
+--CROSS_COMPILE=riscv32-linux- \
+--ramdisk_root_path={$RAMDISK_ROOT} \
+--tar_file_path={$LINUX_ROOT}
+}
+function display_nds_env(){
+	echo "RAMDISK_ROOT:" $RAMDISK_ROOT
+	echo " "
+	echo "LINUX_ROOT:" $LINUX_ROOT
+	echo " "
+	echo "NDS_TOOLCHAIN:" $NDS_TOOLCHAIN
+	echo " "
+	echo "ANDESIGHT_ROOT:" $ANDESIGHT_ROOT
+	echo " "
+	echo "ABI_DIR:" $ABI_DIR
+	echo " "
+	echo "ABI_DST_DIR:" $ABI_DST_DIR
+	echo " "
+	echo "ARCH:" $ARCH
+	echo " "
+	echo "MARCH:" $MARCH
+	echo " "
+	echo "CROSS_COMPILE:" $CROSS_COMPILE
+	echo " "
+	echo "PATH:" $PATH
+	echo " "
+	
+	
+
+}
+
+function sdhome(){
+	ldir=$(pwd)
+	export RAMDISK_ROOT=$ldir
+	echo "RAMDISK_ROOT:" $RAMDISK_ROOT
+}
+
+function linuxhome(){
+	ldir=$(pwd)
+	export LINUX_ROOT=$ldir
+	LINUXROOT=$ldir
+	echo "LINUX_ROOT:" $LINUX_ROOT
+}
+
+function andesighroot (){
+	ldir=$(pwd)
+	export ANDESIGHT_ROOT=$ldir
+	ANDESIGHTROOT=$ldir
+	echo "ANDESIGHT_ROOT" $ANDESIGHT_ROOT
+}
+
+function ndstoolchain(){
+        AndeSigh_path="/home/jacky/Andestech/"
+        read -p "32-bits CPU or 64-bits CPU? " CPU
+        echo " "
+
+        ###Init $PATH###
+        #setenv PATH $rpath
+
+        ###Display & select AndeSigh version###
+        ls $AndeSigh_path | grep AndeSigh
+        read -p "Select AndeSigh version: " AndeSigh_version
+        version=(${AndeSigh_version//./ })
+        AndeSigh="/home/jacky/Andestech/AndeSight_STD_v${version[0]}${version[1]}${version[2]}/toolchains"
+
+        echo " "
+
+        ###Display & select toolchain###
+        ls $AndeSigh | grep mculib | grep $CPU
+        read -p "Select toolchain: " toolchain
+        TOOLCHAIN="${AndeSigh}/nds${CPU}le-elf-mculib-$toolchain/bin"
+        echo " "
+
+        ###Set NDS_TOOLCHAIN & PATH###
+        if [ -d $TOOLCHAIN ]; then
+                #setenv PATH $TOOLCHAIN:$PATH
+                export NDS_TOOLCHAIN=$TOOLCHAIN
+                echo "NDS_TOOLCHAIN:" $NDS_TOOLCHAIN
+        else
+                echo "Toolchain NOT exists."
+        fi
+}
+  
+
+function linuxtoolchain(){
+        AndeSigh_path="/home/jacky/Andestech/"
+        read -p "32-bits CPU or 64-bits CPU? " CPU
+        echo " "
+
+        ###Init $PATH###
+        #setenv PATH $rpath
+
+        ###Display & select AndeSigh version###
+        ls $AndeSigh_path | grep AndeSigh
+        read -p "Select AndeSigh version: " AndeSigh_version
+        version=(${AndeSigh_version//./ })
+        AndeSigh="/home/jacky/Andestech/AndeSight_STD_v${version[0]}${version[1]}${version[2]}/toolchains"
+	export ANDESIGHT_ROOT="/home/jacky/Andestech/AndeSight_STD_v${version[0]}${version[1]}${version[2]}"
+        echo " "
+
+        ###Display & select toolchain###
+        ls $AndeSigh | grep linux | grep $CPU
+        read -p "Select toolchain: " toolchain
+        TOOLCHAIN="${AndeSigh}/nds${CPU}le-linux-glibc-$toolchain"
+	TOOCHAINROOT="nds${CPU}le-linux-glibc-$toolchain"
+
+        echo " "
+
+        ###Set NDS_TOOLCHAIN & PATH###
+        if [ -d $TOOLCHAIN ]; then
+                #setenv PATH $TOOLCHAIN:$PATH
+                export NDS_TOOLCHAIN=$TOOCHAINROOT
+                echo "NDS_TOOLCHAIN:" $NDS_TOOLCHAIN
+                echo "ANDESIGHT_ROOT:" $ANDESIGHT_ROOT
+        else
+                echo "Toolchain NOT exists."
+        fi
+}
